@@ -4,7 +4,9 @@
     <facet type="jpa" name="JPA">
       <configuration>
         <setting name="validation-enabled" value="true" />
-        <datasource-mapping />
+        <datasource-mapping>
+          <factory-entry name="TaskJDBC" value="3f2d80e3-ac95-4388-b0b7-f192eabceec8" />
+        </datasource-mapping>
         <naming-strategy-map />
       </configuration>
     </facet>
