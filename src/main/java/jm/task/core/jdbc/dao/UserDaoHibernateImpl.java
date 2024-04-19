@@ -9,12 +9,12 @@ import org.hibernate.Transaction;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
-    private Transaction transaction = null;
     public UserDaoHibernateImpl() {
     }
 
     @Override
     public void createUsersTable() {
+        Transaction transaction = null;
         try (Session session = Util.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.getSession().createNativeQuery("""
@@ -26,13 +26,16 @@ public class UserDaoHibernateImpl implements UserDao {
                 """).executeUpdate();
             transaction.commit();
         }catch (HibernateException e){
-            transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
 
     @Override
     public void dropUsersTable() {
+        Transaction transaction = null;
         try (Session session = Util.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.getSession().createNativeQuery("""
@@ -40,51 +43,63 @@ public class UserDaoHibernateImpl implements UserDao {
                 """).executeUpdate();
             transaction.commit();
         }catch (HibernateException e) {
-            transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
+        Transaction transaction = null;
         try (Session session = Util.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.getSession().save(new User(name, lastName, age));
             transaction.commit();
         } catch (HibernateException e) {
-            transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
 
     @Override
     public void removeUserById(long id) {
+        Transaction transaction1 = null;
         try (Session session = Util.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
+
             session.remove(session.get(User.class, id));
-            transaction.commit();
         }catch (HibernateException e) {
-            transaction.rollback();
+            if (transaction1 != null) {
+                transaction1.rollback();
+            }
             e.printStackTrace();
         }
     }
 
     @Override
     public List<User> getAllUsers() {
+        Transaction transaction = null;
         try (Session session = Util.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
+            transaction.commit();
             return session.createQuery("SELECT a FROM users a", User.class).getResultList();
         }
     }
 
     @Override
     public void cleanUsersTable() {
+        Transaction transaction = null;
         try (Session session = Util.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.createSQLQuery("TRUNCATE TABLE USERS").executeUpdate();
             transaction.commit();
         } catch (HibernateException e) {
-            transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
